@@ -1,13 +1,19 @@
 const http = require('http');
+const commander = require('./commands');
+const tools = require('./tools');
 
 const server = http.createServer((req, res) => {
     if (req.method === 'POST') {
         let body = '';
         req.on('data', chunk => {
             body += chunk.toString();
-            console.log(body);
+            var contents = tools.decodeData(body);
+            var datas = contents.slice(1);
+            console.log(contents);
             res.writeHead(200, {'Content-Type':'text/plain'});
-            res.end('Received your Message');
+            commander.runCommand(contents[0], datas).then(result => {
+                res.end(result);
+            });
         });
         /*req.on('end', ()=> {
             console.log('')
